@@ -1,41 +1,33 @@
 from docx import Document
 from docx.shared import Pt
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.oxml.ns import qn
 from datetime import datetime
 
 def save_to_docx(text: str, filename: str = "Gereksinim_Dokumani.docx") -> None:
     doc = Document()
 
-    # --- FORM BAŞLIĞI ve ÜST BİLGİLER ---
-    heading = doc.add_heading("📄 Ürün Gereksinim Dokümanı", level=1)
-    heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    # 📌 HEADER (Her sayfada üst bilgi)
+    section = doc.sections[0]
+    header = section.header
+    paragraph = header.paragraphs[0]
+    header_text = f"FRM-PRD-001 | Ürün Gereksinim Dokümanı | Versiyon: 1.0 | Tarih: {datetime.today().strftime('%d.%m.%Y')}"
+    run = paragraph.add_run(header_text)
+    run.bold = True
+    run.font.size = Pt(9)
+    paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-    doc.add_paragraph()  # boşluk bırak
+    # 🏷️ Ana Başlık
+    title = doc.add_heading("Ürün Özellik Gereksinim Dokümanı", level=1)
+    title.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+    doc.add_paragraph()
 
-    table = doc.add_table(rows=5, cols=2)
-    table.style = 'Table Grid'
-
-    fields = [
-        ("Form Adı", "Ürün Gereksinim Dokümanı"),
-        ("Form Numarası", "FRM-PRD-001"),
-        ("Versiyon", "1.0"),
-        ("Hazırlayan", "Otomatik AI Sistem"),
-        ("Tarih", datetime.today().strftime("%d.%m.%Y")),
-    ]
-
-    for i, (label, value) in enumerate(fields):
-        table.cell(i, 0).text = label
-        table.cell(i, 1).text = value
-
-    doc.add_paragraph()  # boşluk bırak
-
-    # --- GPT'den Gelen Metni Yaz ---
+    # 📄 İçerik
     for line in text.splitlines():
         clean_line = line.strip()
         if not clean_line:
             doc.add_paragraph()
         elif clean_line.startswith(tuple("1234567890")) and clean_line[1:3] == ". ":
-            # Başlık formatı (örn: 1. Başlık)
             para = doc.add_paragraph()
             run = para.add_run(clean_line)
             run.bold = True
