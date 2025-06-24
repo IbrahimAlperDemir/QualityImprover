@@ -41,7 +41,7 @@ Yukarıdaki bilgilerle aşağıdaki başlıklarda profesyonel bir Gereksinim Dok
 
 def generate_requirements(inputs: dict) -> str:
     response = client.chat.completions.create(
-        model="gpt-4o",  # Gerekirse gpt-3.5-turbo ile de değiştirilebilir
+        model="gpt-4o",
         messages=[
             {"role": "system", "content": "Profesyonel bir ürün yöneticisi olarak gereksinim dokümanı oluştur."},
             {"role": "user", "content": build_prompt(inputs)}
